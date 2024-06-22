@@ -1,11 +1,17 @@
 import { Request, Response } from 'express';
-import { db } from '../db';
+import { query } from '../db';
 import { studentTable, User } from '../models/User';
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
-  const users = await db.select().from(studentTable).execute();
-  res.json(users);
+  try {
+    const result = await query('SELECT * FROM users');
+    const users: User[] = result.rows;
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
 };
+
 /*
 export const createUser = async (req: Request, res: Response): Promise<void> => {
   const { name, email } = req.body;
@@ -14,14 +20,14 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
   res.status(201).json(result);
 };
 */
-export const getUserById = async (req: Request, res: Response): Promise<void> => {
-  const user = await db.select().from(studentTable).where(studentTable.id.eq(parseInt(req.params.id))).execute();
-  if (user.length > 0) {
-    res.json(user[0]);
-  } else {
-    res.status(404).send('User not found');
-  }
-};
+// export const getUserById = async (req: Request, res: Response): Promise<void> => {
+//   const user = await db.select().from(studentTable).where(studentTable.id.eq(parseInt(req.params.id))).execute();
+//   if (user.length > 0) {
+//     res.json(user[0]);
+//   } else {
+//     res.status(404).send('User not found');
+//   }
+// };
 
 /*
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
